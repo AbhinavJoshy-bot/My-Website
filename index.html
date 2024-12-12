@@ -1,9 +1,150 @@
 <!doctype html>
 <html>
-  <head> </head>
+  <head> 
+    <meta charset="UTF-8">
+    <title>Generative Art CGI</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #000;
+            overflow: hidden;
+        }
+        #artCanvas {
+            border: 2px solid white;
+            background-color: black;
+        }
+        #controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .control-button {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .control-button:hover {
+            background-color: rgba(255,255,255,0.4);
+        }
+    </style>
+  </head>
   <body>
-    <h1> Hellow </h1>
-    <h2> Heloowee </h2>
+    <h1> This is My Blog </h1>
+    <h2> Helow </h2>
+    <div id="controls">
+        <button class="control-button" id="regenerateBtn">Regenerate</button>
+        <button class="control-button" id="pauseBtn">Pause</button>
+    </div>
+    <canvas id="artCanvas" width="800" height="600"></canvas>
+    <script>
+        class GenerativeArt {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.width = canvas.width;
+                this.height = canvas.height;
+                this.particles = [];
+                this.isPaused = false;
+                this.initParticles();
+            }
+
+            initParticles() {
+                this.particles = [];
+                for (let i = 0; i < 100; i++) {
+                    this.particles.push({
+                        x: Math.random() * this.width,
+                        y: Math.random() * this.height,
+                        radius: Math.random() * 10 + 2,
+                        color: this.generateColor(),
+                        speed: {
+                            x: (Math.random() - 0.5) * 4,
+                            y: (Math.random() - 0.5) * 4
+                        }
+                    });
+                }
+            }
+
+            generateColor() {
+                // Generate vibrant, semi-transparent colors
+                const hue = Math.floor(Math.random() * 360);
+                return `hsla(${hue}, 70%, 50%, 0.7)`;
+            }
+
+            update() {
+                if (this.isPaused) return;
+
+                this.ctx.clearRect(0, 0, this.width, this.height);
+
+                this.particles.forEach(particle => {
+                    // Move particles
+                    particle.x += particle.speed.x;
+                    particle.y += particle.speed.y;
+
+                    // Bounce off walls
+                    if (particle.x < 0 || particle.x > this.width) {
+                        particle.speed.x *= -1;
+                    }
+                    if (particle.y < 0 || particle.y > this.height) {
+                        particle.speed.y *= -1;
+                    }
+
+                    // Draw particle
+                    this.ctx.beginPath();
+                    this.ctx.fillStyle = particle.color;
+                    this.ctx.globalCompositeOperation = 'lighter';
+                    this.ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+                    this.ctx.fill();
+                });
+
+                // Connect particles with lines
+                this.particles.forEach((p1, index) => {
+                    for (let j = index + 1; j < this.particles.length; j++) {
+                        const p2 = this.particles[j];
+                        const distance = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+                        
+                        if (distance < 100) {
+                            this.ctx.beginPath();
+                            this.ctx.strokeStyle = `rgba(255,255,255,${1 - distance/100})`;
+                            this.ctx.moveTo(p1.x, p1.y);
+                            this.ctx.lineTo(p2.x, p2.y);
+                            this.ctx.stroke();
+                        }
+                    }
+                });
+
+                requestAnimationFrame(() => this.update());
+            }
+
+            regenerate() {
+                this.initParticles();
+            }
+
+            togglePause() {
+                this.isPaused = !this.isPaused;
+                if (!this.isPaused) {
+                    this.update();
+                }
+            }
+        }
+
+        // Initialize the generative art
+        const canvas = document.getElementById('artCanvas');
+        const art = new GenerativeArt(canvas);
+        art.update();
+
+        // Event listeners for controls
+        document.getElementById('regenerateBtn').addEventListener('click', () => art.regenerate());
+        document.getElementById('pauseBtn').addEventListener('click', () => art.togglePause());
+    </script>
   </body>
   
 </html>
