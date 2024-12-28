@@ -239,7 +239,7 @@
     </div>
     <div id="nav_bar">
         <button class="nav_ins" id="menu_button">Contacts</button>
-        <button class="nav_ins">blogs</button>
+        <button class="nav_ins" id="blogs_button">blogs</button>
         <button class="nav_ins">CV</button>
     </div>
     <div id="menu">
@@ -305,6 +305,12 @@ document.getElementById('menu_button').addEventListener("click", function() {
     body_env.style.marginLeft = "-10px";
     menu.style.width = "0px";
    }
+})
+</script>
+<script>
+    let blog = document.getElementById("blogs_button");
+    document.getElementById('blogs_button').addEventListener("click", function() {
+    window.scrollTo(0, 1200);
 })
 </script>
 <script type="text/javascript">
