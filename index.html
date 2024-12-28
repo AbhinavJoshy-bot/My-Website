@@ -1,162 +1,570 @@
-<!doctype html>
-<html>
-  <head> 
-    <meta charset="UTF-8">
-    <title>Generative Art CGI</title>
+<!DOCTYPE html>
+<html><head>
     <style>
-        body {
+        body{
+            background-color: rgb(11, 11, 11);
+            padding: 0px;
+            margin: 0px;
+            text-align: center;
+            color: beige;
+            align-content: center;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #000;
+            flex-direction: column;
+        }
+        p {
+            font-size:medium;
+        }
+        a:link {
+        color: green;
+        background-color: transparent;
+        text-decoration: none;
+        }
+        a:visited {
+        color: pink;
+        background-color: transparent;
+        text-decoration: none;
+        }
+
+        #body_envelope{
+            margin-left: -10px;
+            transition-duration: 0.5s;
+            border-top: 0px;
+            border-left: 10px;
+            border-right: 0px;
+            border-bottom: 0px;
+            border-style: solid;
+            border-color: rgb(37, 32, 54);
+        }
+        #nav_bar {
+            background-color: rgb(255, 255, 255);
+            border-top: 0px;
+            border-left: 0px;
+            border-right: 0px;
+            border-bottom: 10px;
+            border-style: solid;
+            border-color: rgb(0, 0, 0);
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            height: 50px;
+            top: 0px;
+            position: fixed;
+        }
+        .nav_ins {
+            background-color:inherit;
+            border: 2px solid rgb(14, 25, 147);
+            color: rgb(0, 0, 0);
+            width:max-content;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition-duration: 0.4s;
+            margin: auto;
+        }
+        .nav_ins:hover {
+            background-color:blue;
+            border: 2px solid rgb(27, 29, 88);
+            color: rgb(36, 226, 138);
+            width:max-content;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin: auto;
+        }
+
+        #menu{
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+            height: 100%;
+            width: 0px;
+            transition-duration: 0.5s;
             overflow: hidden;
         }
-        #artCanvas {
-            border: 2px solid white;
-            background-color: black;
+
+        .menu_ins {
+            margin: auto;
+            white-space: nowrap;
         }
-        #controls {
-            position: absolute;
-            top: 20px;
-            left: 20px;
+
+        #canvas_holder {
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            position: fixed;
+            display: block;
+        }
+        #glcanvas {
+            width: 100%;
+            height: 100%;
+        }
+        .head {
+            display:flex;
+            background-color: rgb(41, 41, 41);
+            flex-direction: column;
+            height: 200px;
+            width: 100%;
+            text-align: center;
+        }
+        .head_in {
+            display: block;
+            align-self: center;
+            color: beige;
+            width:fit-content;
+            height:fit-content;
+            margin-top: 90px;
+        }
+        .showcase{
             display: flex;
-            gap: 10px;
+            flex-direction: column;
+            padding: 0px;
+            border-top: 10px;
+            border-left: 0px;
+            border-right: 0px;
+            border-bottom: 10px;
+            border-style: solid;
+            border-color: rgb(0, 0, 0);
+            border-width: 10px;
+            width: 100%;
+            height: 300px;
+            font-size:xx-large;
+            font-weight:bolder;
+            -webkit-text-stroke-width: 2px;
+            -webkit-text-stroke-color: rgba(255, 255, 255, 0.5);
+            align-content: flex-end;
+            -webkit-text-fill-color: transparent;
+            justify-content:flex-end;
         }
-      #choice {
-            position: absolute;
-            top: 40px;
-            left: 20px;
+        .core {
             display: flex;
-            gap: 10px;
+            flex-direction: row;
+            background-color: rgb(41, 41, 41);
+            background-image:  rgb(41, 41, 41);
+            padding: 0px;
+            align-self: center;
+            width: 100%;
+            height: 600px;
         }
-        .control-button {
-            background-color: rgba(255,255,255,0.2);
-            color: white;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
-            transition: background-color 0.3s;
+        .left {
+            display: flex;
+            flex-direction: column;
+            background-color: rgb(50, 50, 100);
+            background-image: linear-gradient(135deg, rgb(0, 0, 50), rgb(10, 10, 100), rgb(0, 0, 50), rgb(10, 10, 100), rgb(0, 0, 50));
+            border: 15px solid rgb(50, 50, 100);
+            margin: auto;
+            width: 48%;
+            height: 500px;
+            padding: 10px auto;
         }
-        .control-button:hover {
-            background-color: rgba(255,255,255,0.4);
+        .right {
+            display: flex;
+            flex-direction: column;
+            background-color: rgb(50, 50, 100);
+            background-image: linear-gradient(135deg, rgb(0, 0, 50), rgb(10, 10, 100), rgb(0, 0, 50), rgb(10, 10, 100), rgb(0, 0, 50));
+            border: 15px solid rgb(50, 50, 100);
+            margin: auto;
+            width: 48%;
+            height: 500px;
+            padding: 10px auto;
+        }
+        .core_ins {
+            background: inherit;
+            background-image: linear-gradient(135deg, rgba(10, 10, 100, 0.4), rgba(0, 0, 50, 0.4), rgba(10, 10, 100, 0.4));
+            width: 80%;
+            padding: 20px 0px;
+            margin: auto;
+            border: 2px solid rgb(101, 97, 213);
+            border-radius: 10px;
+            transition-duration: 0.4s;
+            box-shadow: 2px 2px 10px rgba(255, 255, 255, 0.4);
+        }
+        .core_ins:hover {
+            background: inherit;
+            background-image: linear-gradient(135deg, rgba(0, 0, 54, 0.4), rgba(5, 5, 129, 0.4), rgba(0, 0, 59, 0.4));
+            width: 80%;
+            padding: 20px 0px;
+            margin: auto;
+            border: 4px solid rgb(101, 97, 213);
+            border-radius: 10px;
+            box-shadow: 2px 2px 20px rgba(255, 255, 255, 0.5);
+        }
+        .core_ins_2 {
+            background-color: rgba(10, 10, 100, 0.2);
+            width: 80%;
+            padding: 20px 0px;
+            margin: auto;
+            border: 2px solid rgb(101, 97, 213);
+            border-radius: 10px;
+            transition-duration: 0.4s;
+            box-shadow: 2px 2px 10px rgba(255, 255, 255, 0.4);
+        }
+        .core_ins_2:hover {
+            background-color: rgba(10, 10, 100, 0.4);
+            width: 80%;
+            padding: 20px 0px;
+            margin: auto;
+            border: 4px solid rgb(101, 97, 213);
+            border-radius: 10px;
+            transition-duration: 0.4s;
+            box-shadow: 2px 2px 20px rgba(255, 255, 255, 0.6);
+        }
+        .trailing{
+            display: flex;
+            flex-direction: column;
+            background-color: rgba(68, 68, 68, 0.5);
+            padding-top: 100px;
+            padding-bottom: 100px;
+            margin: auto;
+            align-self: center;
+            width: 95%;
+            height: 600px;
+        }
+        .trailing_ins {
+            background-color: rgba(38, 38, 38, 0.5);
+            border: 2px solid rgba(120, 120, 120, 0.1);
+            transition-duration: 0.5s;
+            border-radius: 30px;
+            align-self: center;
+            padding: 60px 20px;
+            width: 80%;
+            margin-top: 50px;
         }
     </style>
-  </head>
-  <body>
-    <h1> This is My Blog </h1>
-    <h2> Helow </h2>
-    <div id="controls">
-        <button class="control-button" id="regenerateBtn">Regenerate</button>
-        <button class="control-button" id="pauseBtn">Pause</button>
+</head>
+<body onload="start()">
+    <div id="canvas_holder">
+        <canvas id="glcanvas" width="1000" height="600">
+            Oops, your browser does not support the <code>canvas</code> tag.
+        </canvas>
     </div>
-    <div id = "choice">
-      <p>
-        to run python, go <a href="more.html">here</a>
-      </p>
+    <div id="nav_bar">
+        <button class="nav_ins" id="menu_button">Contacts</button>
+        <button class="nav_ins">blogs</button>
+        <button class="nav_ins">CV</button>
     </div>
-    <canvas id="artCanvas" width="800" height="600"></canvas>
-    <script>
-        class GenerativeArt {
-            constructor(canvas) {
-                this.canvas = canvas;
-                this.ctx = canvas.getContext('2d');
-                this.width = canvas.width;
-                this.height = canvas.height;
-                this.particles = [];
-                this.isPaused = false;
-                this.initParticles();
-            }
+    <div id="menu">
+        <p class="menu_ins">mail : p.abhinavjoshy@gmail.com<br>
+        joshy23@iisertvm.ac.in
+        </p>
+        <a class="menu_ins">Phone : ----------</a>
+        <a class="menu_ins">others :</a>
+    </div>
+<div id="body_envelope">
+    <div class="head">
+        <h1 class="head_in"> My website </h1>
+    </div>
+    <div class="showcase">
+        <h1>
+            Abhinav Joshy
+        </h1>
+    </div>
+    <div class="core">
+        <div class="left">
+            <div class="core_ins">
+                <p> Hi, This is my web page.<br>
+                    You can find some of my works in this page.
+                </p>
+            </div>
+            <div class="core_ins">
+                <p> <a href="https://snt-iiser-tvm.github.io/codingclub/Blogs/Posts/Joshy's%20blog.html">Here</a> you can find my blog in Coding Club IISERTVM.<br>
+                </p>
+            </div>
+        </div>
+        <div class="right">
+            <div class="core_ins_2">
+                CodeChef Profile
+            </div>
+            <div class="core_ins_2">
+                check some webgl shader designs
+            </div>
+        </div>
+    </div>
+    <div class="trailing">
+        <div class="trailing_ins">
+            <a href="https://snt-iiser-tvm.github.io/codingclub/Blogs/Posts/Joshy's%20blog.html">Making a DAW in Python(blog in external site)</a>
+        </div>
+        <div class="trailing_ins">
+            <p>
+                Check some shader Graphics:<br>
+                *<a href="webgl/shader_designs/glsl1.html">Cos-field-objects</a><br>
+                *<a href="webgl/shader_designs/glsl3.html">Surface Waves</a><br>
+                *<a href="webgl/shader_designs/glsl4.html">Surface Waves2</a><br>
+                *<a href="webgl/shader_designs/glsl2.html">Floating Liquid</a>
+            </p>
+        </div>
 
-            initParticles() {
-                this.particles = [];
-                for (let i = 0; i < 100; i++) {
-                    this.particles.push({
-                        x: Math.random() * this.width,
-                        y: Math.random() * this.height,
-                        radius: Math.random() * 10 + 2,
-                        color: this.generateColor(),
-                        speed: {
-                            x: (Math.random() - 0.5) * 4,
-                            y: (Math.random() - 0.5) * 4
-                        }
-                    });
-                }
-            }
-
-            generateColor() {
-                // Generate vibrant, semi-transparent colors
-                const hue = Math.floor(Math.random() * 360);
-                return `hsla(${hue}, 70%, 50%, 0.7)`;
-            }
-
-            update() {
-                if (this.isPaused) return;
-
-                this.ctx.clearRect(0, 0, this.width, this.height);
-
-                this.particles.forEach(particle => {
-                    // Move particles
-                    particle.x += particle.speed.x;
-                    particle.y += particle.speed.y;
-
-                    // Bounce off walls
-                    if (particle.x < 0 || particle.x > this.width) {
-                        particle.speed.x *= -1;
-                    }
-                    if (particle.y < 0 || particle.y > this.height) {
-                        particle.speed.y *= -1;
-                    }
-
-                    // Draw particle
-                    this.ctx.beginPath();
-                    this.ctx.fillStyle = particle.color;
-                    this.ctx.globalCompositeOperation = 'lighter';
-                    this.ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
-                    this.ctx.fill();
-                });
-
-                // Connect particles with lines
-                this.particles.forEach((p1, index) => {
-                    for (let j = index + 1; j < this.particles.length; j++) {
-                        const p2 = this.particles[j];
-                        const distance = Math.hypot(p2.x - p1.x, p2.y - p1.y);
-                        
-                        if (distance < 100) {
-                            this.ctx.beginPath();
-                            this.ctx.strokeStyle = `rgba(255,255,255,${1 - distance/100})`;
-                            this.ctx.moveTo(p1.x, p1.y);
-                            this.ctx.lineTo(p2.x, p2.y);
-                            this.ctx.stroke();
-                        }
-                    }
-                });
-
-                requestAnimationFrame(() => this.update());
-            }
-
-            regenerate() {
-                this.initParticles();
-            }
-
-            togglePause() {
-                this.isPaused = !this.isPaused;
-                if (!this.isPaused) {
-                    this.update();
-                }
+    </div>
+<script type="text/javascript">
+    let body_env = document.getElementById('body_envelope');
+    let menu = document.getElementById('menu');
+document.getElementById('menu_button').addEventListener("click", function() {
+   if(body_env.style.marginLeft != "400px"){
+    body_env.style.marginLeft = "400px";
+    menu.style.width = "400px";
+   }else{
+    body_env.style.marginLeft = "-10px";
+    menu.style.width = "0px";
+   }
+})
+</script>
+<script type="text/javascript">
+    var lastScrollTop = 0;
+    let nav = document.getElementById("nav_bar")
+    window.addEventListener("scroll", function(){ // or window.addEventListener("scroll"....
+    var st = window.pageYOffset || document.documentElement.scrollTop; // Credits: "https://github.com/qeremy/so/blob/master/so.dom.js#L426"
+    if (st > lastScrollTop) {
+        let top = Number(nav.style.top.slice(0, -2));
+        if( top >= -50){
+            let new_top = top + lastScrollTop-st;
+            if(new_top >=-50){
+                nav.style.top = String(new_top)+"px";
+            }else{
+                nav.style.top = "-51px";
             }
         }
+    } else if (st < lastScrollTop) {
+        // upscroll code
+        let top = Number(nav.style.top.slice(0, -2));
+        if(top < 0){
+            let new_top = top + lastScrollTop-st;
+            if(new_top < 0){
+                nav.style.top = String(new_top)+"px";
+            }else{
+                nav.style.top = "0px";
+            }
+        }
+    }
+    lastScrollTop = st <= 0 ? 0 : st; // For Mobile or negative scrolling
+    }, false);
+</script>
+<script type="text/javascript">
+    var lastScrollTop = 0;
+    let boxes = document.getElementsByClassName("trailing_ins");
+    window.addEventListener("scroll", function(){
+    var st = window.pageYOffset || document.documentElement.scrollTop;
+    for(var i = 0; i < boxes.length; i++){
+        if (st > boxes[i].offsetTop-500) {
+            boxes[i].style.backgroundColor = "rgba(50, 50, 100, 0.8)";
+        }else{
+            boxes[i].style.backgroundColor = "rgba(38, 38, 38, 0.1)";
+        }
+    }
+    }, false);
+</script>
+    <script type="text/javascript">
+        let gl;
+        let sId;
+        let vBuff;
+        let iBuff;
+        let transformFeedback;
+        let timer = 0;
+        let canvas = document.getElementById("glcanvas");
+        let doc_width = parseFloat(canvas.width)
+        let doc_height = parseFloat(canvas.height)
 
-        // Initialize the generative art
-        const canvas = document.getElementById('artCanvas');
-        const art = new GenerativeArt(canvas);
-        art.update();
+        class GenerativeArt {
+                    constructor(w, h) {
+                        this.width = w
+                        this.height = h
+                        this.particles = [];
+                        this.initParticles();
+                    }
 
-        // Event listeners for controls
-        document.getElementById('regenerateBtn').addEventListener('click', () => art.regenerate());
-        document.getElementById('pauseBtn').addEventListener('click', () => art.togglePause());
+                    initParticles() {
+                        this.particles = [];
+                        for (let i = 0; i < 10; i++) {
+                            this.particles.push({
+                                x: Math.random() * this.width,
+                                y: Math.random() * this.height,
+                                speed: {
+                                    x: (Math.random() - 0.5),
+                                    y: (Math.random() - 0.5)
+                                }
+                            });
+                        }
+                    }
+
+                    update() {
+                        this.particles.forEach(particle => {
+                            // Move particles
+                            particle.x += particle.speed.x;
+                            particle.y += particle.speed.y;
+
+                            // Bounce off walls
+                            if (particle.x < 0 || particle.x > this.width) {
+                                particle.speed.x *= -1;
+                            }
+                            if (particle.y < 0 || particle.y > this.height) {
+                                particle.speed.y *= -1;
+                            }
+
+                            if(particle.x < -5 || particle.x > this.width + 5 || particle.y < -5 || particle.y > this.height+5)
+                            {
+                                particle.x = Math.random() * this.width;
+                                particle.y = Math.random() * this.height;
+                            }
+
+                        });
+
+                    }
+                    
+                    return_particle_array() {
+                            let parts = [];
+                            this.particles.forEach(particle => {
+                                parts.push(particle.x);
+                                parts.push(particle.y);
+                                parts.push(particle.speed.x);
+                                parts.push(particle.speed.y);
+                            });
+                            return parts;
+                        }
+                }
+        const art = new GenerativeArt(doc_width, doc_height);
+
+        function initWebGL() {
+            let canvas = document.getElementById("glcanvas");
+            gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+            if (!gl) {
+                alert("Unable to initialize WebGL. Your browser may not support it.");
+                return;
+            }
+            gl.clearColor(0.0, 0.0, 0.0, 1.0);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            initShaderProgram();
+            initBuffers();
+        }
+
+        function initShaderProgram() {
+            sId = gl.createProgram();
+            let vertId = gl.createShader(gl.VERTEX_SHADER);
+            let fragId = gl.createShader(gl.FRAGMENT_SHADER);
+            let vert = document.getElementById("vertScript").text;
+            let frag = document.getElementById("fragScript").text;
+
+            gl.shaderSource(vertId, vert);
+            gl.shaderSource(fragId, frag);
+            gl.compileShader(vertId);
+            gl.compileShader(fragId);
+            if (!gl.getShaderParameter(vertId, gl.COMPILE_STATUS)) {
+                alert("Vertex Shader Compiler Error: " + gl.getShaderInfoLog(vertId));
+                gl.deleteShader(vertId);
+                return;
+            }
+            if (!gl.getShaderParameter(fragId, gl.COMPILE_STATUS)) {
+                alert("Fragment Shader Compiler Error: " + gl.getShaderInfoLog(fragId));
+                gl.deleteShader(fragId);
+                return;
+            }
+            gl.attachShader(sId, vertId);
+            gl.attachShader(sId, fragId);
+            gl.linkProgram(sId);
+            if (!gl.getProgramParameter(sId, gl.LINK_STATUS)) {
+                alert("Shader Linking Error: " + gl.getProgramInfoLog(sId));
+            }
+            
+            gl.useProgram(sId);
+            let uID2 = gl.getUniformLocation(sId, "width");
+            gl.uniform1f(uID2, doc_width);
+            let uID3 = gl.getUniformLocation(sId, "height");
+            gl.uniform1f(uID3, doc_height);
+        }
+
+        function initBuffers() {
+            let vertices = new Float32Array([
+                -1.0, -1.0, 0.0,
+                -1.0, 1.0, 0.0,
+                1.0, 1.0, 0.0,
+                1.0, -1.0, 0.0
+            ]);
+            vBuff = gl.createBuffer()
+            gl.bindBuffer(gl.ARRAY_BUFFER, vBuff);
+            gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+            let indices = new Uint16Array([0, 1, 3, 2]);
+            iBuff = gl.createBuffer();
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iBuff);
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+
+            //transformFeedback = gl.createTransformFeedback();
+            //gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, transformFeedback);
+        }
+        window.requestAnimFrame = (function () {
+            return window.requestAnimationFrame ||
+                window.webkitRequestAnimationFrame ||
+                window.mozRequestAnimationFrame ||
+                window.oRequestAnimationFrame ||
+                window.msRequestAnimationFrame ||
+                function (callback) {
+                    window.setTimeout(callback, 1000 / 60);
+                };
+        })();
+
+
+        function animationLoop() {
+            requestAnimFrame(animationLoop);
+            render();
+        }
+
+        function render() {
+            timer += 0.1;
+            art.update();
+            gl.useProgram(sId);
+            let uID = gl.getUniformLocation(sId, "uTime");
+            gl.uniform1f(uID, timer);
+            let uID2 = gl.getUniformLocation(sId, "pos");
+            gl.uniform1fv(uID2, art.return_particle_array());
+            let attId = gl.getAttribLocation(sId, "position");
+            gl.enableVertexAttribArray(attId);
+            gl.bindBuffer(gl.ARRAY_BUFFER, vBuff);
+            gl.vertexAttribPointer(attId, 3, gl.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iBuff);
+            gl.drawElements(gl.TRIANGLE_STRIP, 4, gl.UNSIGNED_SHORT, 0);
+        }
+
+        function start() {
+            initWebGL();
+            animationLoop();
+        }
+
+
     </script>
-  </body>
-  
-</html>
+    <script id="vertScript" type="x-shader/x-vertex">
+        attribute vec3 position; 
+        void main(void) {
+            gl_Position = vec4(position, 1.0);
+        }
+    </script>
+    <script id="fragScript" type="x-shader/x-fragment">
+        precision mediump float;
+        uniform float uTime;
+        uniform float pos[40];
+        uniform float width;
+        uniform float height;
+        float des_density(vec2 v1, vec2 v2) {
+            float v1_dist = length(v1);
+            float v2_dist = length(v2);
+            float density = 1.0/(1.0+v1_dist * v2_dist/20.0);
+            float val = density * abs(cos(5.0*1.57*dot(v1, v2)/length(v1)/length(v2)));
+            return val*20.0;
+        }
+        void main(void) {
+            vec2 st = gl_FragCoord.xy; // vec2(width, height);
+            float b = 0.0;
+            const int arr_len = 40;
+            for(int i = 0; i < arr_len ; i += 4){
+                    for(int k = 0; k < arr_len; k += 4){
+                            vec2 vect1 = vec2((st.y-pos[i+1]), (st.x-pos[i]));
+                            vec2 vect2 = vec2(-(st.y-pos[k+1]), -(st.x-pos[k]));
+                            b += des_density(vect1, vect2);
+
+                    }
+            }
+            if(b > 1.0){
+                b = 0.5;
+            }
+            vec3 color = vec3(0.0, 0.0, b);
+            gl_FragColor = vec4(color, 1.0);
+        }
+    </script>
+
+</div>
+</body></html>
