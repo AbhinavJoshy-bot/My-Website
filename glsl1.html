@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<head>
+    <title>Example 1</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        canvas {
+            display: block;
+            margin: 20px auto;
+            border: 1px solid #ccc;
+        }
+
+        h1 {
+            color: rgb(0, 76, 255);
+            margin-top: 20px;
+        }
+
+        h3 {
+            color: #000000;
+            margin-bottom: 20px;
+        }
+        
+        #frame_rate {
+            color: #213d76;
+            margin-bottom: 20px;
+            outline-color: black;
+            outline-width: 2px;
+        }
+        #glcanvas {
+            position: fixed;
+            width: 100%;
+            height:100%;
+        }
+    </style>
+</head>
+
+<body onload="start()">
+    <h1>Dynamic Design</h1>
+    <h3>Using webgl and uniform array buffers</h3>
+    <h3 id="frame_rate">frame rate not working</h3>
+    <canvas id="glcanvas" width="1000" height="600">
+        Oops, your browser does not support the <code>canvas</code> tag.
+    </canvas>
+
+    <script type="text/javascript">
+        let gl;
+        let sId;
+        let vBuff;
+        let iBuff;
+        let transformFeedback;
+        let timer = 0;
+        let canvas = document.getElementById("glcanvas");
+        let doc_width = parseFloat(canvas.width)
+        let doc_height = parseFloat(canvas.height)
+
+        class GenerativeArt {
+                    constructor(w, h) {
+                        this.width = w
+                        this.height = h
+                        this.particles = [];
+                        this.initParticles();
+                    }
+
+                    initParticles() {
+                        this.particles = [];
+                        for (let i = 0; i < 10; i++) {
+                            this.particles.push({
+                                x: Math.random() * this.width,
+                                y: Math.random() * this.height,
+                                speed: {
+                                    x: (Math.random() - 0.5),
+                                    y: (Math.random() - 0.5)
+                                }
+                            });
+                        }
+                    }
+
+                    update() {
+                        this.particles.forEach(particle => {
+                            // Move particles
+                            particle.x += particle.speed.x;
+                            particle.y += particle.speed.y;
+
+                            // Bounce off walls
+                            if (particle.x < 0 || particle.x > this.width) {
+                                particle.speed.x *= -1;
+                            }
+                            if (particle.y < 0 || particle.y > this.height) {
+                                particle.speed.y *= -1;
+                            }
+
+                            if(particle.x < -5 || particle.x > this.width + 5 || particle.y < -5 || particle.y > this.height+5)
+                            {
+                                particle.x = Math.random() * this.width;
+                                particle.y = Math.random() * this.height;
+                            }
+
+                        });
+
+                    }
+                    
+                    return_particle_array() {
+                            let parts = [];
+                            this.particles.forEach(particle => {
+                                parts.push(particle.x);
+                                parts.push(particle.y);
+                                parts.push(particle.speed.x);
+                                parts.push(particle.speed.y);
+                            });
+                            return parts;
+                        }
+                }
+        const art = new GenerativeArt(doc_width, doc_height);
+        console.log(art.return_particle_array());
+
+        function initWebGL() {
+            let canvas = document.getElementById("glcanvas");
+            gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+            if (!gl) {
+                alert("Unable to initialize WebGL. Your browser may not support it.");
+                return;
+            }
+            gl.clearColor(0.0, 0.0, 0.0, 1.0);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            initShaderProgram();
+            initBuffers();
+        }
+
+        function initShaderProgram() {
+            sId = gl.createProgram();
+            let vertId = gl.createShader(gl.VERTEX_SHADER);
+            let fragId = gl.createShader(gl.FRAGMENT_SHADER);
+            let vert = document.getElementById("vertScript").text;
+            let frag = document.getElementById("fragScript").text;
+
+            gl.shaderSource(vertId, vert);
+            gl.shaderSource(fragId, frag);
+            gl.compileShader(vertId);
+            gl.compileShader(fragId);
+            if (!gl.getShaderParameter(vertId, gl.COMPILE_STATUS)) {
+                alert("Vertex Shader Compiler Error: " + gl.getShaderInfoLog(vertId));
+                gl.deleteShader(vertId);
+                return;
+            }
+            if (!gl.getShaderParameter(fragId, gl.COMPILE_STATUS)) {
+                alert("Fragment Shader Compiler Error: " + gl.getShaderInfoLog(fragId));
+                gl.deleteShader(fragId);
+                return;
+            }
+            gl.attachShader(sId, vertId);
+            gl.attachShader(sId, fragId);
+            gl.linkProgram(sId);
+            if (!gl.getProgramParameter(sId, gl.LINK_STATUS)) {
+                alert("Shader Linking Error: " + gl.getProgramInfoLog(sId));
+            }
+            
+            gl.useProgram(sId);
+            let uID2 = gl.getUniformLocation(sId, "width");
+            gl.uniform1f(uID2, doc_width);
+            let uID3 = gl.getUniformLocation(sId, "height");
+            gl.uniform1f(uID3, doc_height);
+        }
+
+        function initBuffers() {
+            let vertices = new Float32Array([
+                -1.0, -1.0, 0.0,
+                -1.0, 1.0, 0.0,
+                1.0, 1.0, 0.0,
+                1.0, -1.0, 0.0
+            ]);
+            vBuff = gl.createBuffer()
+            gl.bindBuffer(gl.ARRAY_BUFFER, vBuff);
+            gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+            let indices = new Uint16Array([0, 1, 3, 2]);
+            iBuff = gl.createBuffer();
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iBuff);
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+
+            //transformFeedback = gl.createTransformFeedback();
+            //gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, transformFeedback);
+        }
+        window.requestAnimFrame = (function () {
+            return window.requestAnimationFrame ||
+                window.webkitRequestAnimationFrame ||
+                window.mozRequestAnimationFrame ||
+                window.oRequestAnimationFrame ||
+                window.msRequestAnimationFrame ||
+                function (callback) {
+                    window.setTimeout(callback, 1000 / 60);
+                };
+        })();
+
+
+        let t_beg = Date.now();
+        let t_fin = Date.now();
+        let t_diff;
+        function animationLoop() {
+            requestAnimFrame(animationLoop);
+            if(timer >= 1.0){
+                t_fin = Date.now();
+                t_diff = (t_fin - t_beg)/10;
+                t_beg = Date.now();
+                timer = 0.0;
+                const f = document.getElementById("frame_rate")
+                f.textContent = "Frame rate = " + String(1000/t_diff);
+            }
+            render();
+        }
+
+        function render() {
+            timer += 0.1;
+            art.update();
+            gl.useProgram(sId);
+            let uID = gl.getUniformLocation(sId, "uTime");
+            gl.uniform1f(uID, timer);
+            let uID2 = gl.getUniformLocation(sId, "pos");
+            gl.uniform1fv(uID2, art.return_particle_array());
+            let attId = gl.getAttribLocation(sId, "position");
+            gl.enableVertexAttribArray(attId);
+            gl.bindBuffer(gl.ARRAY_BUFFER, vBuff);
+            gl.vertexAttribPointer(attId, 3, gl.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iBuff);
+            gl.drawElements(gl.TRIANGLE_STRIP, 4, gl.UNSIGNED_SHORT, 0);
+        }
+
+        function start() {
+            initWebGL();
+            animationLoop();
+        }
+
+
+    </script>
+    <script id="vertScript" type="x-shader/x-vertex">
+        attribute vec3 position; 
+        void main(void) {
+            gl_Position = vec4(position, 1.0);
+        }
+    </script>
+    <script id="fragScript" type="x-shader/x-fragment">
+        precision mediump float;
+        uniform float uTime;
+        uniform float pos[40];
+        uniform float width;
+        uniform float height;
+        float des_density(vec2 v1, vec2 v2) {
+            float v1_dist = length(v1);
+            float v2_dist = length(v2);
+            float density = 1.0/(1.0+v1_dist * v2_dist/20.0);
+            float val = density * abs(cos(5.0*1.57*dot(v1, v2)/length(v1)/length(v2)));
+            return val*20.0;
+        }
+        void main(void) {
+            vec2 st = gl_FragCoord.xy; // vec2(width, height);
+            float b = 0.0;
+            const int arr_len = 40;
+            for(int i = 0; i < arr_len ; i += 4){
+                    for(int k = 0; k < arr_len; k += 4){
+                            vec2 vect1 = vec2((st.y-pos[i+1]), (st.x-pos[i]));
+                            vec2 vect2 = vec2(-(st.y-pos[k+1]), -(st.x-pos[k]));
+                            b += des_density(vect1, vect2);
+
+                    }
+            }
+            if(b > 1.0){
+                b = 0.5;
+            }
+            vec3 color = vec3(0.0, 0.0, b);
+            gl_FragColor = vec4(color, 1.0);
+        }
+    </script>
+</body>
+
+</html>
