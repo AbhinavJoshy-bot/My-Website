@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html><head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body{
-            background-color: rgb(11, 11, 11);
+            background-color: rgb(11, 21, 50);
             padding: 0px;
             margin: 0px;
             text-align: center;
@@ -100,11 +101,13 @@
         }
         .head {
             display:flex;
-            background-color: rgb(41, 41, 41);
+            background-color: rgba(41, 41, 41, 0.1);
             flex-direction: column;
             height: 200px;
             width: 100%;
             text-align: center;
+            box-shadow: 0px 1px 10px rgba(255, 255, 255, 0.4);
+            transition-duration: 0.4s;
         }
         .head_in {
             display: block;
@@ -126,7 +129,7 @@
             border-color: rgb(0, 0, 0);
             border-width: 10px;
             width: 100%;
-            height: 300px;
+            height: 550px;
             font-size:xx-large;
             font-weight:bolder;
             -webkit-text-stroke-width: 2px;
@@ -134,12 +137,12 @@
             align-content: flex-end;
             -webkit-text-fill-color: transparent;
             justify-content:flex-end;
+            transition-duration: 1.0s;
         }
         .core {
             display: flex;
             flex-direction: row;
             background-color: rgb(41, 41, 41);
-            background-image:  rgb(41, 41, 41);
             padding: 0px;
             align-self: center;
             width: 100%;
@@ -229,6 +232,16 @@
             width: 80%;
             margin-top: 50px;
         }
+        @media only screen and (max-width: 620px) {
+            /* For mobile phones: */
+            .core {
+                flex-direction: column;
+                height: 1200;
+            }
+            .left, .right {
+                width: 96%;
+            }
+        }
     </style>
 </head>
 <body onload="start()">
@@ -295,6 +308,9 @@
 
     </div>
 <script type="text/javascript">
+
+</script>
+<script type="text/javascript">
     let body_env = document.getElementById('body_envelope');
     let menu = document.getElementById('menu');
 document.getElementById('menu_button').addEventListener("click", function() {
@@ -346,6 +362,8 @@ document.getElementById('menu_button').addEventListener("click", function() {
 <script type="text/javascript">
     var lastScrollTop = 0;
     let boxes = document.getElementsByClassName("trailing_ins");
+    let showcase_ = document.getElementsByClassName("showcase");
+    let head = document.getElementsByClassName("head");
     window.addEventListener("scroll", function(){
     var st = window.pageYOffset || document.documentElement.scrollTop;
     for(var i = 0; i < boxes.length; i++){
@@ -354,6 +372,13 @@ document.getElementById('menu_button').addEventListener("click", function() {
         }else{
             boxes[i].style.backgroundColor = "rgba(38, 38, 38, 0.1)";
         }
+    }
+    if(st <= 0){
+        showcase_[0].style.height = "550px";
+        head[0].style.backgroundColor = "rgba(41,41,41, 0.1)"
+    }else{
+        showcase_[0].style.height = "300px";
+        head[0].style.backgroundColor = "rgba(41,41,41, 1.0)"
     }
     }, false);
 </script>
@@ -365,8 +390,9 @@ document.getElementById('menu_button').addEventListener("click", function() {
         let transformFeedback;
         let timer = 0;
         let canvas = document.getElementById("glcanvas");
-        let doc_width = parseFloat(canvas.width)
-        let doc_height = parseFloat(canvas.height)
+        let doc_width = window.innerWidth;
+        let doc_height = window.innerHeight;
+
 
         class GenerativeArt {
                     constructor(w, h) {
@@ -555,6 +581,7 @@ document.getElementById('menu_button').addEventListener("click", function() {
         void main(void) {
             vec2 st = gl_FragCoord.xy; // vec2(width, height);
             float b = 0.0;
+            float g = 0.0;
             const int arr_len = 40;
             for(int i = 0; i < arr_len ; i += 4){
                     for(int k = 0; k < arr_len; k += 4){
@@ -567,7 +594,10 @@ document.getElementById('menu_button').addEventListener("click", function() {
             if(b > 1.0){
                 b = 0.5;
             }
-            vec3 color = vec3(0.0, 0.0, b);
+            if(g>1.0){
+                g=0.5;
+            }
+            vec3 color = vec3(0.0, b/5.0, b);
             gl_FragColor = vec4(color, 1.0);
         }
     </script>
