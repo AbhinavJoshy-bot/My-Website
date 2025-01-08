@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html><head>
+    <meta name="keywords" content="Website, Abhinav, Joshy, Art, WebGL, Blogs">
+    <meta name="description" content="Contains my info and Some of my works">
+    <meta name="author" content="Abhinav Joshy">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body{
@@ -101,6 +104,10 @@
         }
         .head {
             display:flex;
+            margin: auto;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: clip; 
             background-color: rgba(41, 41, 41, 0.1);
             flex-direction: column;
             height: 200px;
@@ -132,6 +139,7 @@
             height: 550px;
             font-size:xx-large;
             font-weight:bolder;
+            white-space: nowrap;
             -webkit-text-stroke-width: 2px;
             -webkit-text-stroke-color: rgba(255, 255, 255, 0.5);
             align-content: flex-end;
@@ -147,12 +155,12 @@
             align-self: center;
             width: 100%;
             height: 600px;
+            box-shadow: 0px 1px 5px rgba(255, 255, 255, 0.4);
         }
         .left {
             display: flex;
             flex-direction: column;
-            background-color: rgb(50, 50, 100);
-            background-image: linear-gradient(135deg, rgb(0, 0, 50), rgb(10, 10, 100), rgb(0, 0, 50), rgb(10, 10, 100), rgb(0, 0, 50));
+            background-color: rgb(6, 6, 48);
             border: 15px solid rgb(50, 50, 100);
             margin: auto;
             width: 48%;
@@ -162,8 +170,7 @@
         .right {
             display: flex;
             flex-direction: column;
-            background-color: rgb(50, 50, 100);
-            background-image: linear-gradient(135deg, rgb(0, 0, 50), rgb(10, 10, 100), rgb(0, 0, 50), rgb(10, 10, 100), rgb(0, 0, 50));
+            background-color: rgb(6, 6, 48);
             border: 15px solid rgb(50, 50, 100);
             margin: auto;
             width: 48%;
@@ -253,6 +260,7 @@
     <div id="nav_bar">
         <button class="nav_ins" id="menu_button">Contacts</button>
         <button class="nav_ins" id="blogs_button">blogs</button>
+        <button class="nav_ins" id="Art_button">Art</button>
         <button class="nav_ins">CV</button>
     </div>
     <div id="menu">
@@ -307,9 +315,7 @@
         </div>
 
     </div>
-<script type="text/javascript">
-
-</script>
+    
 <script type="text/javascript">
     let body_env = document.getElementById('body_envelope');
     let menu = document.getElementById('menu');
@@ -331,9 +337,12 @@ document.getElementById('menu_button').addEventListener("click", function() {
 </script>
 <script type="text/javascript">
     var lastScrollTop = 0;
+    let boxes = document.getElementsByClassName("trailing_ins");
+    let showcase_ = document.getElementsByClassName("showcase");
+    let head = document.getElementsByClassName("head");
     let nav = document.getElementById("nav_bar")
-    window.addEventListener("scroll", function(){ // or window.addEventListener("scroll"....
-    var st = window.pageYOffset || document.documentElement.scrollTop; // Credits: "https://github.com/qeremy/so/blob/master/so.dom.js#L426"
+    window.addEventListener("scroll", function(){
+    var st = window.pageYOffset || document.documentElement.scrollTop;
     if (st > lastScrollTop) {
         let top = Number(nav.style.top.slice(0, -2));
         if( top >= -50){
@@ -357,22 +366,17 @@ document.getElementById('menu_button').addEventListener("click", function() {
         }
     }
     lastScrollTop = st <= 0 ? 0 : st; // For Mobile or negative scrolling
-    }, false);
-</script>
-<script type="text/javascript">
-    var lastScrollTop = 0;
-    let boxes = document.getElementsByClassName("trailing_ins");
-    let showcase_ = document.getElementsByClassName("showcase");
-    let head = document.getElementsByClassName("head");
-    window.addEventListener("scroll", function(){
-    var st = window.pageYOffset || document.documentElement.scrollTop;
+
     for(var i = 0; i < boxes.length; i++){
         if (st > boxes[i].offsetTop-500) {
             boxes[i].style.backgroundColor = "rgba(50, 50, 100, 0.8)";
+            boxes[i].style.boxshadow = "2px 2px 10px rgba(255, 255, 255, 0.4)";
         }else{
             boxes[i].style.backgroundColor = "rgba(38, 38, 38, 0.1)";
+            boxes[i].style.boxShadow = "2px 2px 10px rgba(255, 255, 255, 0.0)";
         }
     }
+
     if(st <= 0){
         showcase_[0].style.height = "550px";
         head[0].style.backgroundColor = "rgba(41,41,41, 0.1)"
@@ -381,6 +385,8 @@ document.getElementById('menu_button').addEventListener("click", function() {
         head[0].style.backgroundColor = "rgba(41,41,41, 1.0)"
     }
     }, false);
+
+
 </script>
     <script type="text/javascript">
         let gl;
@@ -432,8 +438,8 @@ document.getElementById('menu_button').addEventListener("click", function() {
 
                             if(particle.x < -5 || particle.x > this.width + 5 || particle.y < -5 || particle.y > this.height+5)
                             {
-                                particle.x = Math.random() * this.width;
-                                particle.y = Math.random() * this.height;
+                                particle.x = (Math.random() * this.width)*2;
+                                particle.y = (Math.random() * this.height)*2;
                             }
 
                         });
@@ -553,6 +559,10 @@ document.getElementById('menu_button').addEventListener("click", function() {
         }
 
         function start() {
+            //For mobile phones
+            if(window.innerWidth < 640){
+                return;
+            }
             initWebGL();
             animationLoop();
         }
